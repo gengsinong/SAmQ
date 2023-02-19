@@ -16,7 +16,7 @@ This file uses wandb.
 
 To generate the decision-making data for dynamic discrete choice model estimation, we consider a synthetic setting similar to the bus engine application in the [Rust Method](https://www.google.com/search?q=rust+bus+engine&rlz=1C1CHBF_zh-TWUS812US812&oq=rust+bus+engine&aqs=chrome..69i57j0i22i30.2014j0j7&sourceid=chrome&ie=UTF-8). 
 The specific setting is defined and detialed in [`env.bus_env`](https://github.com/gengsinong/SAmQ/blob/master/env/bus_env.py). 
-Then, we conduct soft-q iteration to estiamte the optimal choice-specific value function, and generate data in [`rl.softQ`](https://github.com/gengsinong/closeState/blob/master/rl/softQ.py). 
+Then, we conduct soft-q iteration to estiamte the optimal choice-specific value function, and generate data in [`rl.softQ`](https://github.com/gengsinong/SAmQ/blob/master/rl/softQ.py). 
 
 ## Important State Estiamtion
 
