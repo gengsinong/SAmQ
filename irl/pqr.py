@@ -12,8 +12,6 @@ from torch.nn import CrossEntropyLoss
 from torch.nn import BCEWithLogitsLoss
 
 import datetime
-import sys
-sys.path.append("/home/ubuntu/github/cS")
 from dataClass.irl_class import pqr_dataclass
 from torch.utils.data import Dataset, DataLoader
 import pickle

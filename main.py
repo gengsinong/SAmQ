@@ -8,7 +8,6 @@ from helper.util import Log
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import trange
 from helper.rewards import linear_reward 
-#from rl.softQ import rlRunner
 from env.bus_env import syn_bus_env
 from env.airline_env import airline_env
 from rl.softQ import soft_q_iteration
@@ -51,7 +50,7 @@ def run(args):
         log = Log(log_path, vars(args))
         writer = SummaryWriter(log.dir)
 
-        data_path = Path('/home/ubuntu/github/cS/ailrline_data')
+        data_path = Path('ailrline_data')
         env = airline_env(data_path, args.carr_id, r_f, log.dir)
         
         re_dict = {'Number of states':env.n_states, 'd_s':env.d_s}

@@ -11,8 +11,6 @@ from torch.nn import BCEWithLogitsLoss
 from scipy.special import softmax
 import datetime
 import sys
-sys.path.append("/home/ubuntu/github/cS")
-#from dataClass.dataClass import dataClass
 from dowel import logger, tabular
 import pickle
 from helper.functions import _Default, make_optimizer, makePath,setupTensorboard, dumpAllTensorboard
@@ -109,7 +107,7 @@ class soft_q_iteration():
         s = np.array(s)
         p = np.array(p)
         q = np.array(q)
-        print(np.array(a).mean())
+        print(f'The portion of replacement in training data is {np.array(a).mean()}')
 
         np.save(self.path/'s.npy', s[:-2,:])
         np.save(self.path/'s_next.npy', s[1:-1,:])
@@ -128,7 +126,7 @@ class soft_q_iteration():
             a.append(temp_a)
         a = np.array(a).reshape((len(a),1))
         s = np.array(s)
-        print(np.array(a).mean())
+        print(f'The portion of replacement in test data is {np.array(a).mean()}')
 
         np.save(self.path/'s_test.npy', s[:-1,:])
         np.save(self.path/'a_test.npy', a)

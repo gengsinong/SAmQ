@@ -8,7 +8,7 @@ import numpy as np
 import os
 import datetime
 import sys
-sys.path.append("/home/ubuntu/github/cS")
+#sys.path.append("/home/ubuntu/github/cS")
 #from dataClass.dataClass import dataClass
 #from torch.utils.data import Dataset, DataLoader
 import pickle
