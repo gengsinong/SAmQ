@@ -17,6 +17,7 @@ setup(
         "protobuf==3.13.0",
         "dowel==0.0.3",
         "tqdm==4.62.3",
-        "wandb==0.13.4"
+        "wandb==0.13.4",
+        "protobuf==3.19.4",
     ]
 )
