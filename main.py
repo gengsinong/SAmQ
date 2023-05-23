@@ -7,7 +7,7 @@ import torch
 from SAmQ.helper.util import Log
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import trange
-from SAmQ.helper.rewards import linear_reward 
+from SAmQ.helper.rewards import linear_reward
 from SAmQ.env.bus_env import syn_bus_env
 from SAmQ.env.airline_env import airline_env
 from SAmQ.rl.softQ import soft_q_iteration
@@ -25,7 +25,7 @@ def run(args):
     # pick reward
     if args.reward_type == 'linear':
         r_f = linear_reward
-    
+
     if args.env_name == 'bus_engine':
         args.d_s = len(args.theta)
 
@@ -35,9 +35,9 @@ def run(args):
         log(f'Log dir: {log.dir}')
         writer = SummaryWriter(log.dir)
         log('Generate Data - Soft Q')
-        softq = soft_q_iteration(discount=args.discount, optimizer = torch.optim.Adam, l_r=args.learning_rate, 
+        softq = soft_q_iteration(discount=args.discount, optimizer = torch.optim.Adam, l_r=args.learning_rate,
             hidden_size=args.hidden_size, env=env, log = log)
-        softq_dict = softq.train(n_epochs=args.n_steps*2, batch_size=args.batch_size, epoch_size=args.epoch_size, 
+        softq_dict = softq.train(n_epochs=args.n_steps*2, batch_size=args.batch_size, epoch_size=args.epoch_size,
             num_workers = 0, patience = args.patience, writer=writer)
         re_dict = softq_dict
 
@@ -52,7 +52,7 @@ def run(args):
 
         data_path = Path('ailrline_data')
         env = airline_env(data_path, args.carr_id, r_f, log.dir)
-        
+
         re_dict = {'Number of states':env.n_states, 'd_s':env.d_s}
         data_class = airline_dataclass
 
@@ -62,10 +62,10 @@ def run(args):
     else:
         raise NotImplementedError
 
-    pqr_mod = pqr_aggregation(data = data_class(log.dir / 'data_generation'), discount=args.discount, optimizer=torch.optim.Adam, 
+    pqr_mod = pqr_aggregation(data = data_class(log.dir / 'data_generation'), discount=args.discount, optimizer=torch.optim.Adam,
         l_r=args.learning_rate, hidden_size=args.hidden_size, env=env, log=log)
-    
-    if args.method == 'pqr' or args.method == 'our':    
+
+    if args.method == 'pqr' or args.method == 'our':
         log('Run PQR')
         p_dict = pqr_mod.train_q(nEpochs=args.n_steps, batch_size=args.batch_size, num_workers=0, patience=args.patience, writer=writer)
         re_dict = {**re_dict, **p_dict}
@@ -85,7 +85,7 @@ def run(args):
         re_dict['number of states after aggregation'] = n_states_aggregated
         data_class(log.dir / 'data_generation',str(args.delta)+args.method)
         if args.base_method == 'pqr':
-            pqr_mod = pqr_aggregation(data = data_class(log.dir / 'data_generation',str(args.delta)+args.method), discount=args.discount, optimizer=torch.optim.Adam, 
+            pqr_mod = pqr_aggregation(data = data_class(log.dir / 'data_generation',str(args.delta)+args.method), discount=args.discount, optimizer=torch.optim.Adam,
                 l_r=args.learning_rate, hidden_size=args.hidden_size, env=env, log=log, aggregate_or_not=True)
             log('Run PQR')
             p_dict = pqr_mod.train_q(nEpochs=args.n_steps, batch_size=args.batch_size, num_workers=0, patience=args.patience, writer=writer)
@@ -100,7 +100,7 @@ def run(args):
         elif args.base_method == 'mle':
             log('Run Rust DDM')
             def f(theta):
-                ddm_mod = rust_ddm(discount=args.discount, log=log, env=env, delta=args.delta, r_f =r_f, 
+                ddm_mod = rust_ddm(discount=args.discount, log=log, env=env, delta=args.delta, r_f =r_f,
                     aggregation_method=args.method)
                 ddm_mod.get_r(args.b, theta)
                 estiamted_dict = ddm_mod.get_q(n_steps=args.n_steps, alpha=0.1)
@@ -108,14 +108,14 @@ def run(args):
                 test_likelihood = ddm_mod.get_p_test()
                 log(f'Input theta is {np.array(theta)}')
                 log(f'Objective value is {-train_likelihood}')
-                log(f'test_likelihood  is {test_likelihood}') 
+                log(f'test_likelihood  is {test_likelihood}')
                 re_dict['test_likelihood'] = test_likelihood
                 re_dict['train_likelihood'] = train_likelihood
                 return -train_likelihood
             f(args.theta)
             f(args.theta_0)
             solver = optimize.minimize(f, args.theta_0)
-            reward_mse = ((np.array(solver.x) - np.array(args.theta))**2).mean() 
+            reward_mse = ((np.array(solver.x) - np.array(args.theta))**2).mean()
         else:
             raise NotImplementedError
     else:
@@ -150,15 +150,14 @@ if __name__ == '__main__':
     parser.add_argument('--learning-rate', type=float, default=0.004)
     parser.add_argument('--alpha', type=float, default=0.005)
     parser.add_argument('--delta', type=float, default=None)
-    parser.add_argument('--n-states-aggregated', type=int, default=5)    
-    parser.add_argument('--theta', nargs='+', type=float, default = [1,1])
-    parser.add_argument('--theta-0', nargs='+', type=float, default = [0.5,0.5])
+    parser.add_argument('--n-states-aggregated', type=int, default=5)
+    parser.add_argument('--theta', nargs='+', type=float, default = [1,0,0])
+    parser.add_argument('--theta-0', nargs='+', type=float, default = [0.5,0.5,0.5])
     parser.add_argument('--carr-id', type = int, default = 1)
 
-    
+
 
 
     wandb.init(config = parser.parse_args())
     re_dict = run(parser.parse_args())
     wandb.log(re_dict)
-    
